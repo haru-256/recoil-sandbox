@@ -1,19 +1,14 @@
 "use client";
 
 import React from "react";
-import useSWR from "swr";
 import { useRecoilState } from "recoil";
 import { messageAtom } from "@/store/atom";
-import { apiClient } from "@/libs/client";
-import { EchoType } from "@/schema/echo";
+import { useInitialMessage } from "@/libs/client";
 
 export default function Board() {
-  const { data, isLoading, error } = useSWR("/api/echo", async (url) => {
-    const { data } = await apiClient.get<EchoType>(url);
-    return data;
-  });
+  const { data, isLoading, error } = useInitialMessage();
   const [message, setMessage] = useRecoilState(messageAtom);
-  // 初期値はAPIから設定
+  // 初期値の設定
   React.useEffect(() => {
     if (data?.message) setMessage(data.message);
   }, [data?.message]);
@@ -27,7 +22,6 @@ export default function Board() {
         Messages from Echo Form will appear here.
       </p>
       <p className="h-5 font-bold">{isLoading ? "..." : message}</p>
-      <p></p>
     </div>
   );
 }

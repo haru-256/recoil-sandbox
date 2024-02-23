@@ -1,11 +1,14 @@
 "use client";
-import { apiClient } from "@/libs/client";
+
+import { apiClient, fetchInitialMessage } from "@/libs/client";
 import { useSetRecoilState } from "recoil";
 import { messageAtom } from "@/store/atom";
 import { EchoType } from "@/schema/echo";
 import Axios from "axios";
+import React from "react";
 
 export default function Form() {
+  const [formValue, setFormValue] = React.useState<string>("");
   const setMessage = useSetRecoilState(messageAtom);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -27,6 +30,14 @@ export default function Form() {
         console.error(error);
       }
     }
+  };
+  const onReset = async () => {
+    const data = await fetchInitialMessage();
+    setMessage(data.message);
+    setFormValue("");
+  };
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormValue(event.target.value);
   };
 
   return (
@@ -50,6 +61,8 @@ export default function Form() {
             name="message"
             id="message"
             autoComplete="on"
+            value={formValue}
+            onChange={onChange}
             className="block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
             placeholder="Type something"
           />
@@ -57,7 +70,8 @@ export default function Form() {
       </div>
       <div className="mt-6 flex items-center justify-end gap-x-3">
         <button
-          type="reset"
+          type="button"
+          onClick={onReset}
           className="rounded-md px-3 py-2 text-sm font-semibold leading-6 text-gray-900 shadow-sm hover:bg-gray-100"
         >
           Cancel
@@ -66,7 +80,7 @@ export default function Form() {
           type="submit"
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
-          Save
+          Send
         </button>
       </div>
     </form>
